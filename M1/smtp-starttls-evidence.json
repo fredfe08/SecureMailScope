@@ -1,0 +1,283 @@
+{
+  "schema_version": "1.0",
+  "module": "M1-PCAP-Network-Evidence-Extraction",
+  "input": {
+    "path": "C:\\Users\\Admin\\Downloads\\securemailscope-m1\\securemailscope-m1\\smtp-starttls.pcap"
+  },
+  "tooling": {
+    "tshark_version": "TShark (Wireshark) 4.6.8 (v4.6.8-0-ge677bf052328).",
+    "verified_fields": {
+      "frame.number": true,
+      "frame.time_epoch": true,
+      "frame.len": true,
+      "ip.src": true,
+      "ip.dst": true,
+      "ipv6.src": true,
+      "ipv6.dst": true,
+      "tcp.stream": true,
+      "tcp.srcport": true,
+      "tcp.dstport": true,
+      "tcp.flags": true,
+      "tcp.len": true,
+      "tcp.completeness": true,
+      "smtp.req": true,
+      "smtp.response": true,
+      "smtp.response.code": true,
+      "imap.request": true,
+      "imap.response": true,
+      "pop.request": true,
+      "pop.response": true,
+      "tls.record.content_type": true,
+      "tls.handshake.type": true,
+      "tls.handshake.version": true,
+      "tls.handshake.extensions.supported_version": true,
+      "tls.handshake.extensions_server_name": true,
+      "tls.handshake.ciphersuite": true,
+      "tls.handshake.certificate": true
+    },
+    "field_verification_error": null
+  },
+  "capture_quality": {
+    "status": "OBSERVED",
+    "packet_count": 36,
+    "tcp_syn_packets": 2,
+    "tcp_fin_packets": 2,
+    "tcp_rst_packets": 0,
+    "tcp_completeness_values": [
+      "0",
+      "1",
+      "15",
+      "3",
+      "31",
+      "7"
+    ],
+    "notes": [
+      "Heuristic only; absence of a handshake is not proof of absence.",
+      "tcp.completeness was observed, but its bitmask semantics must be verified for this TShark/Wireshark version."
+    ]
+  },
+  "protocol_detection": {
+    "packet_counts": {
+      "smtp": 5,
+      "imap": 0,
+      "pop": 0,
+      "tls": 16
+    },
+    "observed_protocols": [
+      "smtp",
+      "tls"
+    ]
+  },
+  "tcp_streams": [
+    {
+      "tcp_stream": 0,
+      "first_frame": 1,
+      "last_frame": 36,
+      "packet_count": 36,
+      "src_endpoints": [
+        [
+          "10.0.0.1",
+          57406
+        ],
+        [
+          "173.194.68.26",
+          25
+        ]
+      ],
+      "dst_endpoints": [
+        [
+          "173.194.68.26",
+          25
+        ],
+        [
+          "10.0.0.1",
+          57406
+        ]
+      ],
+      "payload_bytes": 6011,
+      "flags": [
+        "0x0002",
+        "0x0012",
+        "0x0010",
+        "0x0018",
+        "0x0011"
+      ]
+    }
+  ],
+  "starttls": [
+    {
+      "protocol": "smtp",
+      "frame": 8,
+      "advertised": true,
+      "attempted": false,
+      "acknowledged_or_accepted": false,
+      "tls_followed": false,
+      "status": "ADVERTISED"
+    },
+    {
+      "protocol": "smtp",
+      "frame": 9,
+      "advertised": null,
+      "attempted": true,
+      "acknowledged_or_accepted": true,
+      "tls_followed": true,
+      "status": "TLS_FOLLOWED"
+    }
+  ],
+  "tls": {
+    "status": "OBSERVED",
+    "observed_tls_packets": 16,
+    "tls_versions": [
+      "TLS 1.0"
+    ],
+    "supported_versions": [],
+    "handshake_stages": [
+      {
+        "frame": 11,
+        "stage": "ClientHello"
+      },
+      {
+        "frame": 12,
+        "stage": "ServerHello"
+      }
+    ],
+    "handshake_complete": false
+  },
+  "certificates": [
+    {
+      "parse_status": "OK",
+      "der_hex": "308206843082056ca0030201020208325d8297987d50b0300d06092a864886f70d01010505003049310b300906035504061302555331133011060355040a130a476f6f676c6520496e63312530230603550403131c476f6f676c6520496e7465726e657420417574686f72697479204732301e170d3133303930393131333233355a170d3134303930393131333233355a3067310b30090603550406130255533113301106035504080c0a43616c69666f726e69613116301406035504070c0d4d6f756e7461696e205669657731133011060355040a0c0a476f6f676c6520496e633116301406035504030c0d6d782e676f6f676c652e636f6d30820122300d06092a864886f70d01010105000382010f003082010a0282010100e426834ab76c89916f8dcff2168a6ce75741fbbfef46fc6c0a1c0f36fa1266f04b1436e93c647a487230f57a8be783fcb2ae3a13996a94e558417c5adc7e39e3e68523506a51e733a5283845edf7fd99a5970c4314d8508f8c58f0cc6d89d4dc71758fa2fc07cd487a7e1fbd12642a139120490b46dab1a3b8f1bac9b0f3639c8e3c7c59920d0490794398dc5f614a5cc64c5a3d303b37c6988c1bfea96b7f89ca1cea7066619b92fab0f7162577e96762bcff0516082746105b1ec4e640a9e00e329ac0e91b36a0cbe5226152eee2587cacf39825ae05b75b297a58ff3c9ff26f8e7fa05352b3a3f6cc17c968b37de456b93a6bcc632bc870a734d6c94cbca10203010001a38203503082034c301d0603551d250416301406082b0601050507030106082b06010505070302308202260603551d110482021d3082021982126173706d782e6c2e676f6f676c652e636f6d8217616c74312e6173706d782e6c2e676f6f676c652e636f6d8217616c74322e6173706d782e6c2e676f6f676c652e636f6d8217616c74332e6173706d782e6c2e676f6f676c652e636f6d8217616c74342e6173706d782e6c2e676f6f676c652e636f6d821a676d61696c2d736d74702d696e2e6c2e676f6f676c652e636f6d821f616c74312e676d61696c2d736d74702d696e2e6c2e676f6f676c652e636f6d821f616c74322e676d61696c2d736d74702d696e2e6c2e676f6f676c652e636f6d821f616c74332e676d61696c2d736d74702d696e2e6c2e676f6f676c652e636f6d821f616c74342e676d61696c2d736d74702d696e2e6c2e676f6f676c652e636f6d8218676d722d736d74702d696e2e6c2e676f6f676c652e636f6d821d616c74312e676d722d736d74702d696e2e6c2e676f6f676c652e636f6d821d616c74322e676d722d736d74702d696e2e6c2e676f6f676c652e636f6d821d616c74332e676d722d736d74702d696e2e6c2e676f6f676c652e636f6d821d616c74342e676d722d736d74702d696e2e6c2e676f6f676c652e636f6d820d6d782e676f6f676c652e636f6d82156173706d78322e676f6f676c656d61696c2e636f6d82156173706d78332e676f6f676c656d61696c2e636f6d82156173706d78342e676f6f676c656d61696c2e636f6d82156173706d78352e676f6f676c656d61696c2e636f6d306806082b06010505070101045c305a302b06082b06010505073002861f687474703a2f2f706b692e676f6f676c652e636f6d2f47494147322e637274302b06082b06010505073001861f687474703a2f2f636c69656e7473312e676f6f676c652e636f6d2f6f637370301d0603551d0e04160414db81128be8eec46e6be6147d0446085036065e62300c0603551d130101ff04023000301f0603551d230418301680144add06161bbcf668b576f581b6bb621aba5a812f30170603551d200410300e300c060a2b06010401d67902050130300603551d1f042930273025a023a021861f687474703a2f2f706b692e676f6f676c652e636f6d2f47494147322e63726c300d06092a864886f70d0101050500038201010061d79a7da1f8241cfe06afa6d8ffd52a508b598873347738855f8a76a41856d7545edc2f9b70e62d872847be56afc7b1b00f6937efd668e2e39d9213580380cbfc9c7bf5ff3ce1f68962edd8efc432f725aa22937334c7726318033e54966524b726421b04f45948322512f6e477c06e55727a2d0d72d8575dfbc21e208d535f53b9a5a74d556fd56e2200c269bcecce3251a1a0aa229de1cc405d636d840b95d5a5ab182c784e796038329de1db451ce63cec6d430b8decb14a0b910dd7e598ff13a9e44b3d30990e8db3b911568b87e9cb47b83050dddfe327f7ee72c8312c906768ff477f727c0859479d1a3b03d00db8827aab99a0d7758b7e7695fc8714",
+      "self_issued": false,
+      "self_signed": null,
+      "subject": "countryName=US, stateOrProvinceName=California, localityName=Mountain View, organizationName=Google Inc, commonName=mx.google.com",
+      "issuer": "countryName=US, organizationName=Google Inc, commonName=Google Internet Authority G2",
+      "serial_number": "3629200462340509872",
+      "not_before": "2013-09-09T11:32:35+00:00",
+      "not_after": "2014-09-09T11:32:35+00:00",
+      "certificate_version": 3,
+      "signature_algorithm": "1.2.840.113549.1.1.5",
+      "public_key_type": "RSAPublicKey",
+      "subject_alternative_names": [
+        "aspmx.l.google.com",
+        "alt1.aspmx.l.google.com",
+        "alt2.aspmx.l.google.com",
+        "alt3.aspmx.l.google.com",
+        "alt4.aspmx.l.google.com",
+        "gmail-smtp-in.l.google.com",
+        "alt1.gmail-smtp-in.l.google.com",
+        "alt2.gmail-smtp-in.l.google.com",
+        "alt3.gmail-smtp-in.l.google.com",
+        "alt4.gmail-smtp-in.l.google.com",
+        "gmr-smtp-in.l.google.com",
+        "alt1.gmr-smtp-in.l.google.com",
+        "alt2.gmr-smtp-in.l.google.com",
+        "alt3.gmr-smtp-in.l.google.com",
+        "alt4.gmr-smtp-in.l.google.com",
+        "mx.google.com",
+        "aspmx2.googlemail.com",
+        "aspmx3.googlemail.com",
+        "aspmx4.googlemail.com",
+        "aspmx5.googlemail.com"
+      ],
+      "frame": 15
+    },
+    {
+      "parse_status": "OK",
+      "der_hex": "30820404308202eca0030201020203023a69300d06092a864886f70d01010505003042310b300906035504061302555331163014060355040a130d47656f547275737420496e632e311b30190603550403131247656f547275737420476c6f62616c204341301e170d3133303430353135313535355a170d3135303430343135313535355a3049310b300906035504061302555331133011060355040a130a476f6f676c6520496e63312530230603550403131c476f6f676c6520496e7465726e657420417574686f7269747920473230820122300d06092a864886f70d01010105000382010f003082010a02820101009c2a04775cd850913a06a382e0d85048bc893ff119701a88467ee08fc5f189ce21ee5afe610db7324489a0740b534f55a4ce826295eeeb595fc6e1058012c45e943fbc5b4838f453f724e6fb91e915c4cff4530df44afc9f54de7dbea06b6f87c0d0501f28300340da0873516c7fff3a3ca737068ebd4b1104eb7d24dee6f9fc3171fb94d560f32e4aaf42d2cbeac46a1ab2cc53dd154b8b1fc819611fcd9da83e632b8435696584c819c54622f85395bee3804a10c62aecba972011c739991004a0f0617a95258c4e5275e2b6ed08ca14fcce226ab34ecf46039797037ec0b1de7baf4533cfba3e71b7def42525c20d35899d9dfb0e1179891e37c5af8e72690203010001a381fb3081f8301f0603551d23041830168014c07a98688d89fbab05640c117daa7d65b8cacc4e301d0603551d0e041604144add06161bbcf668b576f581b6bb621aba5a812f30120603551d130101ff040830060101ff020100300e0603551d0f0101ff040403020106303a0603551d1f04333031302fa02da02b8629687474703a2f2f63726c2e67656f74727573742e636f6d2f63726c732f6774676c6f62616c2e63726c303d06082b060105050701010431302f302d06082b060105050730018621687474703a2f2f6774676c6f62616c2d6f6373702e67656f74727573742e636f6d30170603551d200410300e300c060a2b06010401d679020501300d06092a864886f70d0101050500038201010036d706801127ad2a149b3877b323a07558bbb17e8342ba72da1ed88e360697e0f0953b37fd1b4258fe22c86bbd385ed13b256e12eb5e6776464090da14c8780ded9566da8e866f80a1ba56329586dcdc6aca048c5b7ff6bfcc6f850358c3685113cdfdc8f7793d9935f056a3bde059ed4f4409a39e387af646d11d129d4fbed040fc55fe065e3cda1c56bd96517b6f572adba2aa96dc8c74c295bef06e9513ff17f03cacb2108dcc73fbe88f02c6f0fb33b3953be3c2cb685873dba824623b06359d0da933bd7803902e4c785d503a81d4eea0c87038dcb2f967fa87405d61c0518f6b836bcd053acae1a70578fccada94d02c083d7e1679c8a0502024543371",
+      "self_issued": false,
+      "self_signed": null,
+      "subject": "countryName=US, organizationName=Google Inc, commonName=Google Internet Authority G2",
+      "issuer": "countryName=US, organizationName=GeoTrust Inc., commonName=GeoTrust Global CA",
+      "serial_number": "146025",
+      "not_before": "2013-04-05T15:15:55+00:00",
+      "not_after": "2015-04-04T15:15:55+00:00",
+      "certificate_version": 3,
+      "signature_algorithm": "1.2.840.113549.1.1.5",
+      "public_key_type": "RSAPublicKey",
+      "subject_alternative_names": [],
+      "frame": 15
+    },
+    {
+      "parse_status": "OK",
+      "der_hex": "3082037d308202e6a003020102020312bbe6300d06092a864886f70d0101050500304e310b30090603550406130255533110300e060355040a130745717569666178312d302b060355040b1324457175696661782053656375726520436572746966696361746520417574686f72697479301e170d3032303532313034303030305a170d3138303832313034303030305a3042310b300906035504061302555331163014060355040a130d47656f547275737420496e632e311b30190603550403131247656f547275737420476c6f62616c20434130820122300d06092a864886f70d01010105000382010f003082010a0282010100dacc186330fdf417231a567e5bdf3c6c38e471b77891d4bca1d84cf8a843b603e94d21070888da582f663929bd05788b9d38e805b76a7e71a4e6c460a6b0ef80e489280f9e25d6ed83f3ada691c798c9421835149dad9846922e4fcaf18743c11695572d50ef892d807a57adf2ee5f6bd2008db914f8141535d9c046a37b72c891bfc9552bcdd0973e9c2664ccdfce831971ca4ee6d4d57ba919cd55dec8ecd25e3853e55c4f8c2dfe502336fc66e6cb8ea4391900b7950239910b0efe382ed11d059af64d3e6f0f071daf2c1e8f6039e2fa36531339d45e262bdb3da814bd32eb180328520471e5ab333de138bb073684629c79ea1630f45fc02be8716be4f90203010001a381f03081ed301f0603551d2304183016801448e668f92bd2b295d747d82320104f3398909fd4301d0603551d0e04160414c07a98688d89fbab05640c117daa7d65b8cacc4e300f0603551d130101ff040530030101ff300e0603551d0f0101ff040403020106303a0603551d1f04333031302fa02da02b8629687474703a2f2f63726c2e67656f74727573742e636f6d2f63726c732f73656375726563612e63726c304e0603551d200447304530430604551d2000303b303906082b06010505070201162d68747470733a2f2f7777772e67656f74727573742e636f6d2f7265736f75726365732f7265706f7369746f7279300d06092a864886f70d01010505000381810076e1126e4e4b1612863006b28108cff008c7c7717e66eec2edd43b1ffff0f0c84ed64338b0b9307d18d05583a26acb36119ce84866a36d7fb813d447fe8b5a5c73fcaed91b321938ab973414aa96d2eba31c140849b6bbe591ef8336eb1d566fcadabc736390e47f7b3e22cb3d07ed5f38749ce303504ea1af98ee61f2843f12",
+      "self_issued": false,
+      "self_signed": null,
+      "subject": "countryName=US, organizationName=GeoTrust Inc., commonName=GeoTrust Global CA",
+      "issuer": "countryName=US, organizationName=Equifax, organizationalUnitName=Equifax Secure Certificate Authority",
+      "serial_number": "1227750",
+      "not_before": "2002-05-21T04:00:00+00:00",
+      "not_after": "2018-08-21T04:00:00+00:00",
+      "certificate_version": 3,
+      "signature_algorithm": "1.2.840.113549.1.1.5",
+      "public_key_type": "RSAPublicKey",
+      "subject_alternative_names": [],
+      "frame": 15
+    }
+  ],
+  "handoff": {
+    "network": {
+      "total_packets": 36,
+      "stream_id": 0,
+      "encryption": "tls",
+      "protocol": "SMTP",
+      "port": 25,
+      "client_ip": "10.0.0.1",
+      "extracted_emails": [],
+      "server_ip": "173.194.68.26",
+      "server_hostname": null
+    },
+    "tls": {
+      "domain": "mx.google.com",
+      "server_hostname": null,
+      "protocol": "SMTP",
+      "port": 25,
+      "tls_mode": "starttls",
+      "tls_version": "TLS 1.0",
+      "cipher_name": "0x0005",
+      "cipher_version": "TLS 1.0",
+      "cipher_bits": null,
+      "certificate_common_name": "mx.google.com",
+      "certificate_issuer": "countryName=US, organizationName=Google Inc, commonName=Google Internet Authority G2",
+      "certificate_version": 3,
+      "certificate_serial_number": "3629200462340509872",
+      "certificate_valid_from": "2013-09-09T11:32:35+00:00",
+      "certificate_valid_until": "2014-09-09T11:32:35+00:00",
+      "subject_alternative_names": [
+        "aspmx.l.google.com",
+        "alt1.aspmx.l.google.com",
+        "alt2.aspmx.l.google.com",
+        "alt3.aspmx.l.google.com",
+        "alt4.aspmx.l.google.com",
+        "gmail-smtp-in.l.google.com",
+        "alt1.gmail-smtp-in.l.google.com",
+        "alt2.gmail-smtp-in.l.google.com",
+        "alt3.gmail-smtp-in.l.google.com",
+        "alt4.gmail-smtp-in.l.google.com",
+        "gmr-smtp-in.l.google.com",
+        "alt1.gmr-smtp-in.l.google.com",
+        "alt2.gmr-smtp-in.l.google.com",
+        "alt3.gmr-smtp-in.l.google.com",
+        "alt4.gmr-smtp-in.l.google.com",
+        "mx.google.com",
+        "aspmx2.googlemail.com",
+        "aspmx3.googlemail.com",
+        "aspmx4.googlemail.com",
+        "aspmx5.googlemail.com"
+      ],
+      "hostname_matches_san": null,
+      "certificate_status": "PARSED",
+      "days_until_expiration": null,
+      "starttls_supported": true,
+      "reachable": null
+    },
+    "m2": {
+      "domain": "mx.google.com",
+      "spf": null,
+      "dkim": null,
+      "dmarc": null,
+      "risk": null,
+      "ownership": "M2-DNS-and-analysis",
+      "note": "M1 does not perform DNS lookups, risk scoring, or live reachability checks. M2 should populate these fields."
+    }
+  }
+}
