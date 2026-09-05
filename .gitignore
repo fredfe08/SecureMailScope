@@ -216,3 +216,28 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+.env
+.env.*
+!.env.example
+
+*.log
+*.pcap
+*.pcapng
+
+analysis.json
+evidence.json
+
+.vscode/
+.idea/
+
+.DS_Store
+Thumbs.db
+
+imap_test/
