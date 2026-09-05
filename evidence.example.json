@@ -1,0 +1,66 @@
+{
+  "network": {
+    "total_packets": 0,
+    "stream_id": 0,
+    "encryption": "plaintext",
+    "protocol": "IMAP",
+    "port": 993,
+    "client_ip": "CLIENT_IP",
+    "server_ip": "SERVER_IP",
+    "server_hostname": "imap.example.com",
+    "extracted_emails": []
+  },
+  "tls": {
+    "domain": "imap.example.com",
+    "server_hostname": "imap.example.com",
+    "protocol": "IMAP",
+    "port": 993,
+    "tls_mode": "implicit",
+    "tls_version": "TLSv1.3",
+    "cipher_name": "TLS_AES_256_GCM_SHA384",
+    "cipher_version": "TLSv1.3",
+    "cipher_bits": 256,
+    "certificate_common_name": "imap.example.com",
+    "certificate_issuer": "Example Certificate Authority",
+    "certificate_version": 3,
+    "certificate_serial_number": "EXAMPLE",
+    "certificate_valid_from": "2026-01-01 00:00:00 UTC",
+    "certificate_valid_until": "2026-12-31 23:59:59 UTC",
+    "subject_alternative_names": [
+      "imap.example.com"
+    ],
+    "hostname_matches_san": true,
+    "certificate_status": "Valid",
+    "days_until_expiration": 120,
+    "starttls_supported": false,
+    "reachable": true
+  },
+  "spf": {
+    "record_found": true,
+    "record": "v=spf1 -all",
+    "policy": "-all",
+    "finding": "STRONG_SPF_POLICY",
+    "risk": "LOW",
+    "domain": "example.com"
+  },
+  "dkim": {
+    "record_found": true,
+    "records": [
+      {
+        "selector": "example",
+        "record": "v=DKIM1; p=EXAMPLE"
+      }
+    ],
+    "status": "FOUND",
+    "finding": "DKIM_RECORD_FOUND",
+    "domain": "example.com"
+  },
+  "dmarc": {
+    "record_found": true,
+    "record": "v=DMARC1; p=reject",
+    "policy": "reject",
+    "finding": "STRONG_DMARC_POLICY",
+    "risk": "LOW",
+    "domain": "example.com"
+  }
+}
