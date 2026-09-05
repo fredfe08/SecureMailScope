@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "module": "M1-PCAP-Network-Evidence-Extraction",
+  "input": {"path": "/captures/example.pcapng"},
+  "tooling": {
+    "tshark_version": "TShark (Wireshark) 4.x",
+    "verified_fields": {"frame.number": true, "tcp.stream": true, "tcp.completeness": true},
+    "field_verification_error": null
+  },
+  "capture_quality": {
+    "status": "OBSERVED",
+    "packet_count": 42,
+    "tcp_syn_packets": 1,
+    "tcp_fin_packets": 1,
+    "tcp_rst_packets": 0,
+    "tcp_completeness_values": [],
+    "notes": ["Heuristic only; absence of a handshake is not proof of absence."]
+  },
+  "protocol_detection": {"packet_counts": {"smtp": 10, "imap": 0, "pop": 0, "tls": 12}, "observed_protocols": ["smtp", "tls"]},
+  "tcp_streams": [],
+  "starttls": [{"protocol": "smtp", "frame": 21, "advertised": null, "attempted": true, "acknowledged_or_accepted": true, "tls_followed": true, "status": "TLS_FOLLOWED"}],
+  "tls": {"status": "OBSERVED", "observed_tls_packets": 12, "tls_versions": ["TLS 1.3"], "supported_versions": [], "handshake_stages": [{"frame": 22, "stage": "ClientHello"}, {"frame": 23, "stage": "ServerHello"}], "handshake_complete": false},
+  "certificates": []
+}
