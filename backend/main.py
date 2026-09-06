@@ -22,7 +22,7 @@ EMAIL_OUTPUT_PATH = DATA_DIR / "email_data.json"
 TLS_OUTPUT_PATH = DATA_DIR / "tls_data.json"
 
 # M1's script (the analyzer)
-M1_SCRIPT = Path("./email-engine/analyzer.py")  # or whatever M1's main file is
+M1_SCRIPT = Path("./M1/analyzer.py")  # or whatever M1's main file is
 
 # If true, uses fake data for testing
 USE_MOCKS = os.getenv("USE_MOCKS", "true").lower() == "true"
