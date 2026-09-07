@@ -12,6 +12,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.responses import FileResponse
 import uvicorn
 
 # --------------------------- CONFIG ---------------------------
@@ -302,11 +303,14 @@ async def get_mock_data() -> tuple[dict, dict]:
     }
 
 # --------------------------- MAIN SCAN ENDPOINT (PCAP UPLOAD) ---------------------------
-from fastapi.responses import FileResponse
-import os
 
-# Add this near your other routes (after the imports)
-HTML_PATH = os.path.join(os.path.dirname(__file__), "ui_sih1.html")
+@app.get("/")
+async def root():
+    """Serve the HTML frontend at root."""
+    html_path = os.path.join(os.path.dirname(__file__), "ui_sih1.html")
+    if os.path.exists(html_path):
+        return FileResponse(html_path)
+    return {"message": "SecureMailScope Backend is running. Visit /docs for API documentation."}
 
 @app.get("/")
 async def serve_frontend():
