@@ -312,6 +312,7 @@ async def root():
         return FileResponse(html_path)
     return {"message": "SecureMailScope Backend is running. Visit /docs for API documentation."}
 
+@app.post("/scan",response_model=ScanResponse)
 async def scan_pcap(
     file: UploadFile = File(...),
     domain: Optional[str] = Form(None)  # Optional fallback
