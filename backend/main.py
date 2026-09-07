@@ -302,6 +302,18 @@ async def get_mock_data() -> tuple[dict, dict]:
     }
 
 # --------------------------- MAIN SCAN ENDPOINT (PCAP UPLOAD) ---------------------------
+from fastapi.responses import FileResponse
+import os
+
+# Add this near your other routes (after the imports)
+HTML_PATH = os.path.join(os.path.dirname(__file__), "ui_sih1.html")
+
+@app.get("/")
+async def serve_frontend():
+    """Serve the backup HTML frontend at root."""
+    if os.path.exists(HTML_PATH):
+        return FileResponse(HTML_PATH)
+    return {"message": "SecureMailScope Backend is running. Visit /docs for API documentation."}
 @app.post("/scan", response_model=ScanResponse)
 async def scan_pcap(
     file: UploadFile = File(...),
