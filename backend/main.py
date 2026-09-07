@@ -19,6 +19,8 @@ import uvicorn
 # Paths
 DATA_DIR = Path("./data")
 PCAP_DIR = DATA_DIR / "pcap_uploads"
+DATA_DIR.mkdir(exist_ok=True)
+PCAP_DIR.mkdir(exist_ok=True)
 EMAIL_OUTPUT_PATH = DATA_DIR / "email_data.json"
 TLS_OUTPUT_PATH = DATA_DIR / "tls_data.json"
 
