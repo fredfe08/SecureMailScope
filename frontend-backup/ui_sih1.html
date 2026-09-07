@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureMailScope — Frontend + AI Remediation</title>
+    <style>
+        /* ----- THEME (Hacker/Cyberpunk) ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #020a04;
+            --card: #051408;
+            --border: #005f0f;
+            --text: #39ff14;
+            --muted: #1b8a36;
+            --accent: #39ff14;
+            --accent-hover: #4cff2e;
+            --green: #39ff14;
+            --amber: #ffb000;
+            --red: #ff003c;
+            --font: 'Consolas', 'Courier New', monospace;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .app {
+            width: 1100px;
+            max-width: 100%;
+            max-height: 95vh;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 30px 40px;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(57, 255, 20, 0.05);
+        }
+
+        .app::-webkit-scrollbar {
+            width: 4px;
+        }
+        .app::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        .app::-webkit-scrollbar-thumb {
+            background: var(--border);
+        }
+
+        /* ----- HEADER ----- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .header .brand {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        .header .sub {
+            font-size: 11px;
+            color: var(--muted);
+        }
+        .header .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--green);
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* ----- UPLOAD SECTION ----- */
+        .upload-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 28px 32px;
+            margin-bottom: 24px;
+        }
+        .upload-card label {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        .upload-row {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .upload-row input[type="file"] {
+            flex: 1;
+            background: #000;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 12px;
+            padding: 10px 14px;
+            outline: none;
+            min-width: 200px;
+        }
+        .upload-row input[type="file"]:focus {
+            border-color: var(--accent);
+        }
+        .upload-row input[type="file"]::file-selector-button {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 6px 14px;
+            cursor: pointer;
+        }
+        .upload-row input[type="file"]::file-selector-button:hover {
+            background: var(--card-hover);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: bold;
+            padding: 10px 22px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border);
+            font-family: var(--font);
+            font-size: 10px;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-ghost:hover {
+            background: var(--card-hover);
+        }
+
+        /* ----- LOADING ----- */
+        #loading {
+            display: none;
+            margin: 16px 0;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--amber);
+            font-size: 12px;
+        }
+        #loading .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ----- RESULTS ----- */
+        #results {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .result-summary {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 20px 28px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .result-summary .score-block {
+            text-align: center;
+            min-width: 100px;
+        }
+        .result-summary .score-number {
+            font-size: 48px;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .result-summary .score-label {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: bold;
+        }
+        .result-summary .severity-block {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .result-summary .severity-block .badge {
+            display: inline-block;
+            padding: 4px 16px;
+            background: var(--amber);
+            color: var(--bg);
+            font-size: 14px;
+        }
+        .result-summary .severity-block .badge.critical { background: var(--red); }
+        .result-summary .severity-block .badge.high { background: var(--red); }
+        .result-summary .severity-block .badge.medium { background: var(--amber); }
+        .result-summary .severity-block .badge.low { background: var(--green); }
+
+        .result-summary .meta {
+            font-size: 11px;
+            color: var(--muted);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        /* ----- FINDINGS ----- */
+        .findings-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .finding-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            margin-bottom: 10px;
+        }
+        .finding-card .top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .finding-card .severity-badge {
+            font-size: 9px;
+            font-weight: bold;
+            padding: 2px 12px;
+            color: var(--bg);
+        }
+        .finding-card .severity-badge.critical { background: var(--red); }
+        .finding-card .severity-badge.high { background: var(--red); }
+        .finding-card .severity-badge.medium { background: var(--amber); }
+        .finding-card .severity-badge.low { background: var(--green); }
+        .finding-card .severity-badge.pass { background: var(--green); }
+
+        .finding-card .category {
+            font-size: 10px;
+            color: var(--muted);
+        }
+        .finding-card .title {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .finding-card .detail-label {
+            font-size: 8px;
+            color: var(--muted);
+            font-weight: bold;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .finding-card .detail-text {
+            font-size: 10px;
+            color: var(--text);
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+        .finding-card .status-tag {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 10px;
+            border: 1px solid var(--border);
+        }
+        .finding-card .status-tag.pass { color: var(--green); border-color: var(--green); }
+        .finding-card .status-tag.warn { color: var(--amber); border-color: var(--amber); }
+        .finding-card .status-tag.fail { color: var(--red); border-color: var(--red); }
+
+        /* ----- AI SECTION (M5) ----- */
+        .ai-section {
+            margin-top: 24px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+        .ai-box {
+            background: var(--card);
+            border: 1px solid var(--accent);
+            padding: 16px 20px;
+            margin-bottom: 10px;
+        }
+        .ai-box .ai-label {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ai-box .ai-text {
+            color: var(--text);
+            font-size: 12px;
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+        .ai-box .ai-priority {
+            display: inline-block;
+            font-size: 9px;
+            padding: 2px 10px;
+            margin-top: 6px;
+        }
+        .ai-box .ai-priority.critical { background: var(--red); color: var(--bg); }
+        .ai-box .ai-priority.high { background: var(--red); color: var(--bg); }
+        .ai-box .ai-priority.medium { background: var(--amber); color: var(--bg); }
+        .ai-box .ai-priority.low { background: var(--green); color: var(--bg); }
+
+        .error-box {
+            background: var(--card);
+            border: 1px solid var(--red);
+            padding: 16px 20px;
+            color: var(--red);
+            font-size: 12px;
+            margin: 16px 0;
+        }
+
+        .hidden { display: none !important; }
+        .mt-8 { margin-top: 8px; }
+        .muted { color: var(--muted); font-size: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="app" id="app">
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <span class="brand">root@SECURE_MAIL_SCOPE:~#</span>
+            <span class="sub">Frontend + AI Remediation (Backup)</span>
+        </div>
+        <div>
+            <span class="status-dot"></span>
+            <span class="sub" id="api-status">API: <span id="api-status-text">Checking...</span></span>
+        </div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="upload-card">
+        <label for="pcap-input">Upload PCAP File:</label>
+        <div class="upload-row">
+            <input type="file" id="pcap-input" accept=".pcap,.pcapng" />
+            <button class="btn-primary" id="scan-btn">EXECUTE SCAN</button>
+            <button class="btn-ghost" id="clear-btn">CLEAR</button>
+        </div>
+        <div class="muted" style="margin-top:12px;">
+            Supported: .pcap, .pcapng &nbsp;|&nbsp; API: <span id="api-url-display">http://localhost:8000/scan</span>
+        </div>
+    </div>
+
+    <!-- LOADING -->
+    <div id="loading">
+        <span class="spinner"></span>
+        <span id="loading-text">Processing PCAP... Please wait.</span>
+    </div>
+
+    <!-- ERROR -->
+    <div id="error" class="error-box hidden"></div>
+
+    <!-- RESULTS -->
+    <div id="results">
+        <!-- Score Summary -->
+        <div class="result-summary" id="result-summary">
+            <div class="score-block">
+                <div class="score-number" id="score-number">—</div>
+                <div class="score-label">SYS_SCORE</div>
+            </div>
+            <div class="severity-block">
+                <span class="badge" id="severity-badge">—</span>
+            </div>
+            <div class="meta">
+                <div id="result-filename">File: —</div>
+                <div id="result-timestamp" style="font-size:10px;">—</div>
+            </div>
+        </div>
+
+        <!-- Findings -->
+        <div class="findings-title">▼ VULNERABILITY VECTORS</div>
+        <div id="findings-list"></div>
+
+        <!-- AI Remediation (M5) -->
+        <div class="ai-section" id="ai-section" style="display:none;">
+            <div class="findings-title">▼ AI REMEDIATION (M5 Backup)</div>
+            <div id="ai-results"></div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="margin-top:24px;padding-top:12px;border-top:1px solid var(--border);font-size:9px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;">
+        <span>SecureMailScope v3.0 — Frontend + AI Backup</span>
+        <span id="footer-timestamp"></span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        // ---- DOM refs ----
+        const fileInput = document.getElementById('pcap-input');
+        const scanBtn = document.getElementById('scan-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const loadingDiv = document.getElementById('loading');
+        const loadingText = document.getElementById('loading-text');
+        const errorDiv = document.getElementById('error');
+        const resultsDiv = document.getElementById('results');
+        const findingsList = document.getElementById('findings-list');
+        const aiResults = document.getElementById('ai-results');
+        const aiSection = document.getElementById('ai-section');
+
+        const scoreNumber = document.getElementById('score-number');
+        const severityBadge = document.getElementById('severity-badge');
+        const resultFilename = document.getElementById('result-filename');
+        const resultTimestamp = document.getElementById('result-timestamp');
+        const apiStatusText = document.getElementById('api-status-text');
+        const apiUrlDisplay = document.getElementById('api-url-display');
+        const footerTimestamp = document.getElementById('footer-timestamp');
+
+        // ---- CONFIG ----
+        // 🔥 CHANGE THIS to your deployed backend URL
+        const API_BASE = 'https://your-backend.vercel.app';  // 👈 UPDATE THIS
+        // For local testing: const API_BASE = 'http://localhost:8000';
+
+        const SCAN_URL = API_BASE + '/scan';
+        const HEALTH_URL = API_BASE + '/health';
+
+        // ---- Helpers ----
+        function showError(msg) {
+            errorDiv.textContent = '[-] ERROR: ' + msg;
+            errorDiv.classList.remove('hidden');
+            resultsDiv.style.display = 'none';
+            aiSection.style.display = 'none';
+        }
+
+        function hideError() {
+            errorDiv.classList.add('hidden');
+        }
+
+        function setLoading(show, msg) {
+            if (show) {
+                loadingDiv.style.display = 'block';
+                if (msg) loadingText.textContent = msg;
+                scanBtn.disabled = true;
+            } else {
+                loadingDiv.style.display = 'none';
+                scanBtn.disabled = false;
+            }
+        }
+
+        function formatTimestamp(iso) {
+            if (!iso) return '—';
+            try {
+                const d = new Date(iso);
+                return d.toLocaleString();
+            } catch { return iso; }
+        }
+
+        // ============================================================
+        //  🔥 M5 AI REMEDIATION ENGINE (Rule-based, no API key needed)
+        // ============================================================
+        function generateAIExplanation(findings) {
+            const results = [];
+            for (const f of findings) {
+                let explanation = '';
+                let remediation = '';
+                let priority = f.severity || 'MEDIUM';
+                const cat = f.category || '';
+                const status = f.status || '';
+
+                if (cat === 'SPF') {
+                    if (status === 'FAIL') {
+                        explanation = 'SPF is misconfigured or missing. Attackers can spoof emails from your domain.';
+                        remediation = 'Publish a valid SPF record: v=spf1 include:_spf.your-provider.com -all';
+                        priority = 'HIGH';
+                    } else if (status === 'WARN') {
+                        explanation = 'SPF uses a soft-fail policy (~all). Spoofing attempts are flagged but not blocked.';
+                        remediation = 'Change ~all to -all to enforce hard fail.';
+                        priority = 'MEDIUM';
+                    } else {
+                        explanation = 'SPF is correctly configured. Only authorized servers can send emails from your domain.';
+                        remediation = 'No action required.';
+                        priority = 'LOW';
+                    }
+                } else if (cat === 'DKIM') {
+                    if (status === 'FAIL') {
+                        explanation = 'No DKIM record found. Emails from your domain cannot be cryptographically verified.';
+                        remediation = 'Generate a DKIM key pair and publish the public key in DNS under a selector.';
+                        priority = 'HIGH';
+                    } else if (status === 'WARN') {
+                        explanation = 'DKIM key size is weak (less than 2048 bits). Modern attackers can decrypt these signatures.';
+                        remediation = 'Rotate to a 2048-bit RSA key or Ed25519.';
+                        priority = 'MEDIUM';
+                    } else {
+                        explanation = 'DKIM is correctly configured. Emails are cryptographically signed and verifiable.';
+                        remediation = 'No action required.';
+                        priority = 'LOW';
+                    }
+                } else if (cat === 'DMARC') {
+                    if (status === 'FAIL') {
+                        explanation = 'DMARC is not configured. SPF and DKIM results are not enforced, so spoofed emails bypass filters.';
+                        remediation = 'Publish a DMARC TXT record starting with p=none, then move to p=quarantine, then p=reject.';
+                        priority = 'HIGH';
+                    } else if (status === 'WARN') {
+                        explanation = 'DMARC is set to monitor-only (p=none). It collects reports but takes zero defensive action.';
+                        remediation = 'Move to p=quarantine (send suspicious emails to spam) then p=reject (block).';
+                        priority = 'MEDIUM';
+                    } else {
+                        explanation = 'DMARC is enforcing policies. SPF and DKIM results are used to block unauthenticated emails.';
+                        remediation = 'No action required.';
+                        priority = 'LOW';
+                    }
+                } else if (cat === 'TLS_VERSION' || cat === 'TLS') {
+                    if (status === 'FAIL') {
+                        explanation = 'Deprecated TLS version detected (1.0 or 1.1). Vulnerable to POODLE, BEAST, and other attacks.';
+                        remediation = 'Disable TLS 1.0 and 1.1 immediately. Enforce TLS 1.2 or 1.3.';
+                        priority = 'CRITICAL';
+                    } else if (status === 'WARN') {
+                        explanation = 'TLS version is older but not deprecated. Consider upgrading for stronger security.';
+                        remediation = 'Upgrade to TLS 1.2 or 1.3 by disabling older versions on your mail server.';
+                        priority = 'MEDIUM';
+                    } else {
+                        explanation = 'Modern TLS version (1.2 or 1.3) detected. Transport security is strong.';
+                        remediation = 'No action required.';
+                        priority = 'LOW';
+                    }
+                } else if (cat === 'CERTIFICATE' || cat === 'CERT') {
+                    if (status === 'FAIL') {
+                        explanation = 'Certificate is invalid (expired, revoked, or self-signed). TLS handshake will fail.';
+                        remediation = 'Renew your TLS certificate from a trusted CA (e.g., Let\'s Encrypt).';
+                        priority = 'CRITICAL';
+                    } else if (status === 'WARN') {
+                        explanation = 'Certificate is nearing expiry (less than 30 days). Clients may fail to connect.';
+                        remediation = 'Renew certificate within the next 30 days. Automate renewal with ACME.';
+                        priority = 'MEDIUM';
+                    } else {
+                        explanation = 'Certificate is valid and trusted.';
+                        remediation = 'No action required.';
+                        priority = 'LOW';
+                    }
+                } else if (cat === 'STARTTLS') {
+                    if (status === 'FAIL') {
+                        explanation = 'STARTTLS is not supported. Emails are transmitted in plaintext, vulnerable to MITM.';
+                        remediation = 'Enable STARTTLS on your SMTP server (port 25, 587).';
+                        priority = 'CRITICAL';
+                    } else if (status === 'WARN') {
+                        explanation = 'STARTTLS configuration is unknown. Verify it\'s properly enabled.';
+                        remediation = 'Check EHLO response for STARTTLS. Verify your MTA configuration.';
+                        priority = 'MEDIUM';
+                    } else {
+                        explanation = 'STARTTLS is supported. Emails are upgraded to encrypted connections.';
+                        remediation = 'No action required.';
+                        priority = 'LOW';
+                    }
+                } else if (cat === 'MTA-STS') {
+                    if (status === 'FAIL') {
+                        explanation = 'MTA-STS is not configured. Vulnerable to DNS/MX spoofing downgrade attacks.';
+                        remediation = 'Publish an MTA-STS policy file and DNS TXT record.';
+                        priority = 'HIGH';
+                    } else if (status === 'WARN') {
+                        explanation = 'MTA-STS policy exists but is not enforced (testing mode).';
+                        remediation = 'Move to enforce mode by updating the policy file.';
+                        priority = 'MEDIUM';
+                    } else {
+                        explanation = 'MTA-STS is properly configured and enforced.';
+                        remediation = 'No action required.';
+                        priority = 'LOW';
+                    }
+                } else {
+                    // Default fallback
+                    explanation = `Finding: ${cat} status ${status}. Review your email security configuration.`;
+                    remediation = 'Consult your email administrator for specific remediation steps.';
+                    priority = 'MEDIUM';
+                }
+
+                results.push({
+                    category: cat,
+                    explanation: explanation,
+                    remediation: remediation,
+                    priority: priority
+                });
+            }
+            return results;
+        }
+
+        function renderAI(findings) {
+            if (!findings || findings.length === 0) {
+                aiSection.style.display = 'none';
+                return;
+            }
+
+            const aiData = generateAIExplanation(findings);
+            aiResults.innerHTML = '';
+
+            // Executive summary
+            const critical = aiData.filter(a => a.priority === 'CRITICAL').length;
+            const high = aiData.filter(a => a.priority === 'HIGH').length;
+            const medium = aiData.filter(a => a.priority === 'MEDIUM').length;
+            const total = aiData.length;
+
+            const summaryBox = document.createElement('div');
+            summaryBox.className = 'ai-box';
+            summaryBox.style.borderColor = 'var(--amber)';
+            summaryBox.innerHTML = `
+                <div class="ai-label">📊 EXECUTIVE SUMMARY</div>
+                <div class="ai-text">
+                    Total findings: ${total} &nbsp;|&nbsp;
+                    <span style="color:var(--red);">Critical: ${critical}</span> &nbsp;|&nbsp;
+                    <span style="color:var(--amber);">High: ${high}</span> &nbsp;|&nbsp;
+                    <span style="color:var(--muted);">Medium: ${medium}</span>
+                </div>
+            `;
+            aiResults.appendChild(summaryBox);
+
+            // Individual AI explanations
+            for (const item of aiData) {
+                const card = document.createElement('div');
+                card.className = 'ai-box';
+                const priorityClass = item.priority.toLowerCase();
+                card.innerHTML = `
+                    <div class="ai-label">🔍 AI ANALYSIS: ${item.category}</div>
+                    <div class="ai-text">${item.explanation}</div>
+                    <div class="ai-label" style="margin-top:8px;">🛠️ REMEDIATION</div>
+                    <div class="ai-text">${item.remediation}</div>
+                    <div>
+                        <span class="ai-priority ${priorityClass}">PRIORITY: ${item.priority}</span>
+                    </div>
+                `;
+                aiResults.appendChild(card);
+            }
+
+            aiSection.style.display = 'block';
+        }
+
+        // ---- Render findings ----
+        function renderFindings(findings) {
+            findingsList.innerHTML = '';
+            if (!findings || findings.length === 0) {
+                findingsList.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:12px;">No findings reported.</div>';
+                return;
+            }
+            for (const f of findings) {
+                const card = document.createElement('div');
+                card.className = 'finding-card';
+
+                const sevClass = (f.severity || 'low').toLowerCase();
+                const statusClass = (f.status || 'pass').toLowerCase();
+
+                card.innerHTML = `
+                    <div class="top">
+                        <span class="severity-badge ${sevClass}">${f.severity || 'INFO'}</span>
+                        <span class="category">/${f.category || 'unknown'}</span>
+                        <span class="status-tag ${statusClass}">${f.status || 'UNKNOWN'}</span>
+                    </div>
+                    <div class="title">${f.title || f.category || 'Finding'}</div>
+                    <div class="detail-label">#VULNERABILITY_IMPACT</div>
+                    <div class="detail-text">${f.evidence || f.description || 'No evidence provided.'}</div>
+                    <div class="detail-label">#REMEDIATION_PROTOCOL</div>
+                    <div class="detail-text">${f.recommendation || f.fix || 'No remediation provided.'}</div>
+                `;
+                findingsList.appendChild(card);
+            }
+
+            // 🔥 Render AI explanations (M5)
+            renderAI(findings);
+        }
+
+        // ---- Check API health ----
+        async function checkHealth() {
+            try {
+                const resp = await fetch(HEALTH_URL);
+                if (resp.ok) {
+                    apiStatusText.textContent = 'Online ✅';
+                    apiStatusText.style.color = 'var(--green)';
+                } else {
+                    apiStatusText.textContent = 'Error ⚠️';
+                    apiStatusText.style.color = 'var(--amber)';
+                }
+            } catch (e) {
+                apiStatusText.textContent = 'Offline ❌';
+                apiStatusText.style.color = 'var(--red)';
+            }
+        }
+
+        // ---- Main scan ----
+        async function performScan() {
+            const file = fileInput.files[0];
+            if (!file) {
+                showError('Please select a PCAP file first.');
+                return;
+            }
+
+            hideError();
+            resultsDiv.style.display = 'none';
+            aiSection.style.display = 'none';
+            setLoading(true, `Processing ${file.name}...`);
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const resp = await fetch(SCAN_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!resp.ok) {
+                    let errMsg = `HTTP ${resp.status}`;
+                    try {
+                        const errJson = await resp.json();
+                        if (errJson.detail) errMsg = errJson.detail;
+                    } catch {}
+                    throw new Error(errMsg);
+                }
+
+                const data = await resp.json();
+                setLoading(false);
+
+                // Populate results
+                scoreNumber.textContent = data.score !== undefined ? data.score : '—';
+                scoreNumber.style.color = data.score >= 75 ? 'var(--green)' : (data.score >= 45 ? 'var(--amber)' : 'var(--red)');
+
+                const sev = (data.severity || 'LOW').toUpperCase();
+                severityBadge.textContent = sev;
+                severityBadge.className = 'badge ' + sev.toLowerCase();
+
+                resultFilename.textContent = 'File: ' + (data.filename || file.name);
+                resultTimestamp.textContent = 'Scanned: ' + formatTimestamp(data.timestamp);
+
+                renderFindings(data.findings || []);
+
+                resultsDiv.style.display = 'block';
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (err) {
+                setLoading(false);
+                showError(err.message || 'Scan failed. Check backend logs.');
+                console.error('Scan error:', err);
+            }
+        }
+
+        // ---- Clear ----
+        function clearAll() {
+            fileInput.value = '';
+            resultsDiv.style.display = 'none';
+            aiSection.style.display = 'none';
+            hideError();
+            setLoading(false);
+            findingsList.innerHTML = '';
+            aiResults.innerHTML = '';
+            scoreNumber.textContent = '—';
+            severityBadge.textContent = '—';
+            severityBadge.className = 'badge';
+            resultFilename.textContent = 'File: —';
+            resultTimestamp.textContent = '—';
+            fileInput.focus();
+        }
+
+        // ---- Init ----
+        function init() {
+            apiUrlDisplay.textContent = SCAN_URL;
+            footerTimestamp.textContent = '⏱️ ' + new Date().toLocaleString();
+
+            scanBtn.addEventListener('click', performScan);
+            clearBtn.addEventListener('click', clearAll);
+
+            fileInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') performScan();
+            });
+
+            checkHealth();
+            setInterval(checkHealth, 30000);
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
