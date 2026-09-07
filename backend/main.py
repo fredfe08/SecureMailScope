@@ -309,7 +309,7 @@ async def get_mock_data() -> tuple[dict, dict]:
 @app.get("/")
 async def root():
     """Serve the HTML frontend at root."""
-    html_path = os.path.join(os.path.dirname(__file__), "ui_sih1.html")
+    html_path = os.path.join(os.path.dirname(__file__), "frontend_ui.html")
     if os.path.exists(html_path):
         return FileResponse(html_path)
     return {"message": "SecureMailScope Backend is running. Visit /docs for API documentation."}
